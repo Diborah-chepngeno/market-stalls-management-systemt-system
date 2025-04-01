@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Stalls - Manage Vendors</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .vendors-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-container input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status-active {
+            color: #2ecc71;
+            font-weight: 500;
+        }
+        
+        .status-inactive {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #2c3e50;
+        }
+        
+        .close {
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .close:hover {
+            color: #34495e;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .vendor-details {
+            margin-top: 20px;
+        }
+        
+        .vendor-details h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .vendor-details p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="logo">
+            <img src="../../images/market-logo.png" alt="Market Logo">
+            <h1>Market Stalls Management</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../dashboard.html">Dashboard</a></li>
+                <li><a href="stalls.html">Stalls</a></li>
+                <li><a href="vendors.html" class="active">Vendors</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="dashboard-main">
+        <div class="vendors-container">
+            <h2>Manage Vendors</h2>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="addVendorBtn">Add New Vendor</button>
+                <button class="btn btn-success" id="refreshVendorsBtn">Refresh List</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search vendors by name or email...">
+            </div>
+            
+            <table id="vendorsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Business</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Vendors will be loaded here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    <!-- Add/Edit Vendor Modal -->
+    <div id="vendorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Vendor</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="vendorForm">
+                <input type="hidden" id="vendorId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="businessName">Business Name</label>
+                    <input type="text" id="businessName">
+                </div>
+                <div class="form-group">
+                    <label for="businessType">Business Type</label>
+                    <select id="businessType">
+                        <option value="">Select type</option>
+                        <option value="food">Food & Beverages</option>
+                        <option value="produce">Fresh Produce</option>
+                        <option value="clothing">Clothing & Textiles</option>
+                        <option value="handicraft">Handicrafts</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Vendor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- View Vendor Modal -->
+    <div id="viewVendorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="viewModalTitle">Vendor Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="vendor-details">
+                <h4 id="vendorFullName"></h4>
+                <p><strong>Email:</strong> <span id="viewEmail"></span></p>
+                <p><strong>Phone:</strong> <span id="viewPhone"></span></p>
+                <p><strong>Business:</strong> <span id="viewBusiness"></span></p>
+                <p><strong>Type:</strong> <span id="viewType"></span></p>
+                <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+                <p><strong>Registration Date:</strong> <span id="viewRegDate"></span></p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn" id="closeViewBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/storage.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script>
+        // Check if user is logged in and is admin
+        if (!isLoggedIn() || getCurrentUser().userType !== 'admin') {
+            window.location.href = "../../login.html";
+        }
+
+        // DOM elements
+        const vendorsTable = document.getElementById('vendorsTable').getElementsByTagName('tbody')[0];
+        const addVendorBtn = document.getElementById('addVendorBtn');
+        const refreshVendorsBtn = document.getElementById('refreshVendorsBtn');
+        const searchInput = document.getElementById('searchInput');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const vendorModal = document.getElementById('vendorModal');
+        const viewVendorModal = document.getElementById('viewVendorModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const viewModalTitle = document.getElementById('viewModalTitle');
+        const closeBtns = document.querySelectorAll('.close');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const closeViewBtn = document.getElementById('closeViewBtn');
+        const vendorForm = document.getElementById('vendorForm');
+        const vendorIdInput = document.getElementById('vendorId');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const businessNameInput = document.getElementById('businessName');
+        const businessTypeInput = document.getElementById('businessType');
+        const statusInput = document.getElementById('status');
+
+        // View modal elements
+        const vendorFullName = document.getElementById('vendorFullName');
+        const viewEmail = document.getElementById('viewEmail');
+        const viewPhone = document.getElementById('viewPhone');
+        const viewBusiness = document.getElementById('viewBusiness');
+        const viewType = document.getElementById('viewType');
+        const viewStatus = document.getElementById('viewStatus');
+        const viewRegDate = document.getElementById('viewRegDate');
+
+        // Load vendors when page loads
+        document.addEventListener('DOMContentLoaded', loadVendors);
+
+        // Add vendor button click
+        addVendorBtn.addEventListener('click', () => {
+            vendorForm.reset();
+            vendorIdInput.value = '';
+            modalTitle.textContent = 'Add New Vendor';
+            vendorModal.style.display = 'block';
+        });
+
+        // Refresh vendors button click
+        refreshVendorsBtn.addEventListener('click', loadVendors);
+
+        // Search functionality
+        searchInput.addEventListener('input', searchVendors);
+
+        // Close modal buttons
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                vendorModal.style.display = 'none';
+                viewVendorModal.style.display = 'none';
+            });
+        });
+        
+        cancelBtn.addEventListener('click', () => vendorModal.style.display = 'none');
+        closeViewBtn.addEventListener('click', () => viewVendorModal.style.display = 'none');
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === vendorModal || e.target === viewVendorModal) {
+                vendorModal.style.display = 'none';
+                viewVendorModal.style.display = 'none';
+            }
+        });
+
+        // Form submission
+        vendorForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveVendor();
+        });
+
+        // Logout button
+        logoutBtn.addEventListener('click', () => {
+            logoutUser();
+            window.location.href = "../../login.html";
+        });
+
+        // Load all vendors
+        function loadVendors() {
+            const vendors = getAllVendors();
+            vendorsTable.innerHTML = '';
+
+            vendors.forEach(vendor => {
+                const row = vendorsTable.insertRow();
+                
+                // Status class
+                const statusClass = vendor.status === 'active' ? 'status-active' : 'status-inactive';
+                const statusText = vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1);
+                
+                row.innerHTML = `
+                    <td>${vendor.id}</td>
+                    <td>${vendor.firstName} ${vendor.lastName}</td>
+                    <td>${vendor.email}</td>
+                    <td>${vendor.phone || 'N/A'}</td>
+                    <td>${vendor.businessName || 'N/A'}</td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td>
+                        <button class="btn btn-primary view-btn" data-id="${vendor.id}">View</button>
+                        <button class="btn btn-primary edit-btn" data-id="${vendor.id}">Edit</button>
+                        <button class="btn btn-danger delete-btn" data-id="${vendor.id}">Delete</button>
+                    </td>
+                `;
+            });
+
+            // Add event listeners to action buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', viewVendor);
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', editVendor);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', deleteVendor);
+            });
+        }
+
+        // Search vendors
+        function searchVendors() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const vendors = getAllVendors();
+            const filteredVendors = vendors.filter(vendor => {
+                const fullName = `${vendor.firstName} ${vendor.lastName}`.toLowerCase();
+                return fullName.includes(searchTerm) || 
+                       vendor.email.toLowerCase().includes(searchTerm) ||
+                       (vendor.businessName && vendor.businessName.toLowerCase().includes(searchTerm));
+            });
+
+            vendorsTable.innerHTML = '';
+            
+            filteredVendors.forEach(vendor => {
+                const row = vendorsTable.insertRow();
+                
+                const statusClass = vendor.status === 'active' ? 'status-active' : 'status-inactive';
+                const statusText = vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1);
+                
+                row.innerHTML = `
+                    <td>${vendor.id}</td>
+                    <td>${vendor.firstName} ${vendor.lastName}</td>
+                    <td>${vendor.email}</td>
+                    <td>${vendor.phone || 'N/A'}</td>
+                    <td>${vendor.businessName || 'N/A'}</td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td>
+                        <button class="btn btn-primary view-btn" data-id="${vendor.id}">View</button>
+                        <button class="btn btn-primary edit-btn" data-id="${vendor.id}">Edit</button>
+                        <button class="btn btn-danger delete-btn" data-id="${vendor.id}">Delete</button>
+                    </td>
+                `;
+            });
+
+            // Reattach event listeners
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', viewVendor);
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', editVendor);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', deleteVendor);
+            });
+        }
+
+        // View vendor details
+        function viewVendor(e) {
+            const vendorId = parseInt(e.target.getAttribute('data-id'));
+            const vendors = getAllVendors();
+            const vendor = vendors.find(v => v.id === vendorId);
+            
+            if (vendor) {
+                vendorFullName.textContent = `${vendor.firstName} ${vendor.lastName}`;
+                viewEmail.textContent = vendor.email;
+                viewPhone.textContent = vendor.phone || 'N/A';
+                viewBusiness.textContent = vendor.businessName || 'N/A';
+                viewType.textContent = vendor.businessType ? 
+                    vendor.businessType.charAt(0).toUpperCase() + vendor.businessType.slice(1) : 'N/A';
+                
+                const statusText = vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1);
+                viewStatus.textContent = statusText;
+                viewStatus.className = vendor.status === 'active' ? 'status-active' : 'status-inactive';
+                
+                viewRegDate.textContent = vendor.registrationDate || 'N/A';
+                
+                viewModalTitle.textContent = `Vendor: ${vendor.firstName} ${vendor.lastName}`;
+                viewVendorModal.style.display = 'block';
+            }
+        }
+
+        // Edit vendor
+        function editVendor(e) {
+            const vendorId = parseInt(e.target.getAttribute('data-id'));
+            const vendors = getAllVendors();
+            const vendor = vendors.find(v => v.id === vendorId);
+            
+            if (vendor) {
+                vendorIdInput.value = vendor.id;
+                firstNameInput.value = vendor.firstName;
+                lastNameInput.value = vendor.lastName;
+                emailInput.value = vendor.email;
+                phoneInput.value = vendor.phone || '';
+                businessNameInput.value = vendor.businessName || '';
+                businessTypeInput.value = vendor.businessType || '';
+                statusInput.value = vendor.status;
+                
+                modalTitle.textContent = 'Edit Vendor';
+                vendorModal.style.display = 'block';
+            }
+        }
+
+        // Delete vendor
+        function deleteVendor(e) {
+            if (confirm('Are you sure you want to delete this vendor?')) {
+                const vendorId = parseInt(e.target.getAttribute('data-id'));
+                let users = JSON.parse(localStorage.getItem('market_users') || []);
+                let vendors = getAllVendors();
+                
+                // Remove from vendors list
+                vendors = vendors.filter(vendor => vendor.id !== vendorId);
+                
+                // Also remove from users if exists
+                users = users.filter(user => {
+                    if (user.userType === 'vendor') {
+                        const vendor = vendors.find(v => v.email === user.email);
+                        return vendor !== undefined;
+                    }
+                    return true;
+                });
+                
+                localStorage.setItem('market_users', JSON.stringify(users));
+                
+                // Update vendors in storage (implementation depends on your storage.js)
+                // This would need to be adapted based on how you're storing vendors
+                // For this example, we'll assume vendors are stored separately
+                localStorage.setItem('market_vendors', JSON.stringify(vendors));
+                
+                loadVendors();
+                alert('Vendor deleted successfully');
+            }
+        }
+
+        // Save vendor (add or update)
+        function saveVendor() {
+            let users = JSON.parse(localStorage.getItem('market_users') || []);
+            let vendors = getAllVendors();
+            const vendorData = {
+                firstName: firstNameInput.value,
+                lastName: lastNameInput.value,
+                email: emailInput.value,
+                phone: phoneInput.value,
+                businessName: businessNameInput.value,
+                businessType: businessTypeInput.value,
+                status: statusInput.value,
+                registrationDate: new Date().toLocaleDateString()
+            };
+
+            if (vendorIdInput.value) {
+                // Update existing vendor
+                const index = vendors.findIndex(v => v.id === parseInt(vendorIdInput.value));
+                if (index !== -1) {
+                    vendors[index] = { ...vendors[index], ...vendorData };
+                    
+                    // Also update in users if exists
+                    const userIndex = users.findIndex(u => u.email === vendors[index].email);
+                    if (userIndex !== -1) {
+                        users[userIndex].firstName = vendorData.firstName;
+                        users[userIndex].lastName = vendorData.lastName;
+                    }
+                }
+            } else {
+                // Add new vendor
+                const newId = vendors.length > 0 ? Math.max(...vendors.map(v => v.id)) + 1 : 1;
+                const newVendor = { id: newId, ...vendorData };
+                vendors.push(newVendor);
+                
+                // Also add to users
+                users.push({
+                    firstName: vendorData.firstName,
+                    lastName: vendorData.lastName,
+                    email: vendorData.email,
+                    password: 'temp123', // In real app, generate a temp password or require one
+                    userType: 'vendor'
+                });
+            }
+
+            localStorage.setItem('market_users', JSON.stringify(users));
+            localStorage.setItem('market_vendors', JSON.stringify(vendors));
+            vendorModal.style.display = 'none';
+            loadVendors();
+            alert('Vendor saved successfully');
+        }

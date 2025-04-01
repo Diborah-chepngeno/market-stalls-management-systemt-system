@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Stalls - My Bookings</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .bookings-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status-active {
+            color: #2ecc71;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            color: #f39c12;
+            font-weight: 500;
+        }
+        
+        .status-cancelled {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #2c3e50;
+        }
+        
+        .close {
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .close:hover {
+            color: #34495e;
+        }
+        
+        .booking-details {
+            margin-top: 20px;
+        }
+        
+        .booking-details h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .booking-details p {
+            margin-bottom: 5px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="logo">
+            <img src="../../images/market-logo.png" alt="Market Logo">
+            <h1>Market Stalls Management</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../dashboard.html">Dashboard</a></li>
+                <li><a href="bookings.html" class="active">My Bookings</a></li>
+                <li><a href="payments.html">Payments</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="dashboard-main">
+        <div class="bookings-container">
+            <h2>My Bookings</h2>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="newBookingBtn">New Booking</button>
+                <button class="btn btn-success" id="refreshBookingsBtn">Refresh List</button>
+            </div>
+            
+            <table id="bookingsTable">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Stall Number</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Amount (₦)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Bookings will be loaded here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    <!-- View Booking Modal -->
+    <div id="viewBookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="viewModalTitle">Booking Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="booking-details">
+                <h4 id="bookingStall"></h4>
+                <p><strong>Booking ID:</strong> <span id="bookingId"></span></p>
+                <p><strong>Start Date:</strong> <span id="bookingStart"></span></p>
+                <p><strong>End Date:</strong> <span id="bookingEnd"></span></p>
+                <p><strong>Duration:</strong> <span id="bookingDuration"></span> days</p>
+                <p><strong>Total Amount:</strong> ₦<span id="bookingAmount"></span></p>
+                <p><strong>Status:</strong> <span id="bookingStatus"></span></p>
+                <p><strong>Payment Status:</strong> <span id="paymentStatus"></span></p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" id="cancelBookingBtn" style="display:none;">Cancel Booking</button>
+                <button type="button" class="btn" id="closeViewBtn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Booking Modal -->
+    <div id="newBookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>New Booking</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="stallSelect">Select Stall</label>
+                    <select id="stallSelect" required>
+                        <option value="">Select a stall</option>
+                        <!-- Stalls will be loaded here by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Total Amount: ₦<span id="bookingTotal">0.00</span></label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancelBookingFormBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/storage.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script>
+        // Check if user is logged in
+        if (!isLoggedIn()) {
+            window.location.href = "../../login.html";
+        }
+
+        // DOM elements
+        const bookingsTable = document.getElementById('bookingsTable').getElementsByTagName('tbody')[0];
+        const newBookingBtn = document.getElementById('newBookingBtn');
+        const refreshBookingsBtn = document.getElementById('refreshBookingsBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const viewBookingModal = document.getElementById('viewBookingModal');
+        const newBookingModal = document.getElementById('newBookingModal');
+        const viewModalTitle = document.getElementById('viewModalTitle');
+        const closeBtns = document.querySelectorAll('.close');
+        const closeViewBtn = document.getElementById('closeViewBtn');
+        const cancelBookingBtn = document.getElementById('cancelBookingBtn');
+        const cancelBookingFormBtn = document.getElementById('cancelBookingFormBtn');
+        const bookingForm = document.getElementById('bookingForm');
+        const stallSelect = document.getElementById('stallSelect');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const bookingTotalSpan = document.getElementById('bookingTotal');
+
+        // View modal elements
+        const bookingStall = document.getElementById('bookingStall');
+        const bookingId = document.getElementById('bookingId');
+        const bookingStart = document.getElementById('bookingStart');
+        const bookingEnd = document.getElementById('bookingEnd');
+        const bookingDuration = document.getElementById('bookingDuration');
+        const bookingAmount = document.getElementById('bookingAmount');
+        const bookingStatus = document.getElementById('bookingStatus');
+        const paymentStatus = document.getElementById('paymentStatus');
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.min = today;
+        endDateInput.min = today;
+
+        // Load bookings when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBookings();
+            loadAvailableStalls();
+        });
+
+        // New booking button click
+        newBookingBtn.addEventListener('click', () => {
+            newBookingModal.style.display = 'block';
+        });
+
+        // Refresh bookings button click
+        refreshBookingsBtn.addEventListener('click', loadBookings);
+
+        // Close modal buttons
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                viewBookingModal.style
